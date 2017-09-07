@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+source /usr/bin/generate_container_user
+
+APPROOT=/opt/app-root
+
+if [[ $GIT_SYNC_ROOT == "" ]]
+then
+    export GIT_SYNC_ROOT=$APPROOT/data
+fi
+
+if [[ $GIT_SYNC_DEST == "" ]]
+then
+    export GIT_SYNC_DEST=git
+fi
+
+exec $APPROOT/bin/git-sync "$@"

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+echo
+echo "===> Build started at $(date)"
+echo
+START=$SECONDS
+
+# Unconditionally print elapsed build time at exit
+function finish {
+  echo "===> Elapsed time: $(($SECONDS - $START)) seconds"
+}
+trap finish EXIT
+
+echo "---> Preparing source..."
+SOURCE=$GOPATH/src/k8s.io/git-sync
+mkdir -p $SOURCE
+
+cp -Rf /tmp/src/. $SOURCE
+
+cd $SOURCE
+
+echo "---> Downloading dependencies..."
+
+echo "---> Building application source..."
+make -f Makefile.s2i build
+
+echo "---> Installing application binary..."
+cp cmd/git-sync/git-sync /opt/app-root/bin
+
+echo
+echo "===> Build completed at $(date)"
+
+# Fix source directory permissions
+fix-permissions ./
+copy-stiscripts /opt/app-root/scripts/
